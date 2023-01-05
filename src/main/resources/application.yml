@@ -1,0 +1,6 @@
+repositories:
+  directory: repo
+  public:
+    - spring-spigot
+    - tes
+auth: "admin:admin"

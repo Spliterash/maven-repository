@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "repositories.directory",
+      "type": "java.lang.String",
+      "description": "Где будут находиться все репозитории."
+    },
+    {
+      "name": "repositories.public",
+      "type": "java.lang.String",
+      "description": "Публичные репозитории, доступные всем в group репозитории."
+    }
+  ]
+}
