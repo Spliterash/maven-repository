@@ -1,15 +1,23 @@
 package ru.spliterash.mavenrepository.application
 
-import org.springframework.boot.web.servlet.FilterRegistrationBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.spliterash.mavenrepository.filter.AuthorizationService
-import ru.spliterash.mavenrepository.controllers.AuthFilter
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
+import org.springframework.web.servlet.config.annotation.EnableWebMvc
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import ru.spliterash.mavenrepository.auth.AuthArgumentResolver
 
 @Configuration
-class Configuration {
-    @Bean
-    fun publishFilter(helper: AuthorizationService): FilterRegistrationBean<AuthFilter> {
-        return FilterRegistrationBean(AuthFilter(helper))
+class Configuration(
+    private val authResolver: AuthArgumentResolver
+) : WebMvcConfigurer {
+    override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
+        registry
+            .addResourceHandler("/assets/**")
+            .addResourceLocations("classpath:/reposilite-frontend/assets/")
+    }
+
+    override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
+        resolvers.add(authResolver)
     }
 }

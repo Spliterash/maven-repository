@@ -1,4 +1,4 @@
-package ru.spliterash.mavenrepository.filter
+package ru.spliterash.mavenrepository.auth
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
