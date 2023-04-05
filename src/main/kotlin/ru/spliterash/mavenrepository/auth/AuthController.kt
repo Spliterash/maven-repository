@@ -11,12 +11,12 @@ class AuthController(
 ) {
     @GetMapping("/api/auth/me")
     fun authStatus(
-        @RequestHeader("Authorization") authHeader: String
+        @RequestHeader("Authorization", required = false) authHeader: String?
     ): ResponseEntity<Any> {
-        if (!authorizationService.isAuth(authHeader))
+        if (authHeader == null || !authorizationService.isAuth(authHeader))
             return ResponseEntity.status(401).body("Not authorized")
         else
-            // Who cares
+        // Who cares
             return ResponseEntity.ok(
                 """
                 {

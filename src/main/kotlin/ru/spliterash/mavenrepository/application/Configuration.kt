@@ -6,7 +6,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import ru.spliterash.mavenrepository.auth.AuthArgumentResolver
-
+@EnableWebMvc
 @Configuration
 class Configuration(
     private val authResolver: AuthArgumentResolver
