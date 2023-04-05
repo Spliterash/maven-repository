@@ -2,6 +2,7 @@ package ru.spliterash.mavenrepository.frontend
 
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.ResourceLoader
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
@@ -10,7 +11,8 @@ import java.nio.charset.StandardCharsets
 
 @RestController
 class FrontendController(
-    private val configuration: FrontendConfiguration
+    private val configuration: FrontendConfiguration,
+    private val loader: ResourceLoader
 ) {
     private val pageCache: String by lazy {
         getPage()
@@ -19,7 +21,7 @@ class FrontendController(
 
 
     private fun getPage(): String {
-        val resource = ClassPathResource("reposilite-frontend/index.html")
+        val resource = loader.getResource("classpath:reposilite-frontend/index.html")
 
         val page = resource.inputStream.readAllBytes()
             .decodeToString()
@@ -50,9 +52,10 @@ class FrontendController(
         val servletPath = request.servletPath
 
         return jsCache.computeIfAbsent(servletPath) {
-            val resource = ClassPathResource("/reposilite-frontend$servletPath")
-            if (!resource.isFile) {
-                return@computeIfAbsent "404, im too lazy to to exp, sry"
+            val path = "classpath:reposilite-frontend$servletPath"
+            val resource = loader.getResource(path)
+            if (!resource.isReadable) {
+                return@computeIfAbsent "404, file $path"
             }
 
             resource
