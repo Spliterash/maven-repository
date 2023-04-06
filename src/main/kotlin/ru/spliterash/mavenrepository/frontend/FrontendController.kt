@@ -1,7 +1,6 @@
 package ru.spliterash.mavenrepository.frontend
 
 import jakarta.servlet.http.HttpServletRequest
-import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
@@ -47,7 +46,7 @@ class FrontendController(
         return getPage()
     }
 
-    @GetMapping("/assets/*.js", produces = ["application/javascript"])
+    @GetMapping("/assets/*.js", produces = ["application/javascript;charset=utf-8"])
     fun onJsRequest(request: HttpServletRequest): String {
         val servletPath = request.servletPath
 

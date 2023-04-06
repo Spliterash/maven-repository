@@ -50,10 +50,11 @@ class ApiReadController(
     fun handleNoAuth(response: HttpServletResponse) = noAuth()
 
     private fun mapFile(file: FileInfo): InfoResponse.Item {
-        val ext = file.name.substringBeforeLast(".")
+        val ext = file.name.substringAfterLast(".")
         val contentType = when (ext) {
             "jar" -> "application/java-archive"
             "pom" -> "application/xml"
+            "xml" -> "application/xml"
             else -> "application/octet-stream"
         }
         return if (file.type == FileInfo.Type.FILE)
