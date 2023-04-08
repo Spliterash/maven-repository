@@ -6,6 +6,7 @@ import ru.spliterash.mavenrepository.PUBLIC
 import ru.spliterash.mavenrepository.RESERVED_NAMES
 import ru.spliterash.mavenrepository.auth.NotAuthException
 import ru.spliterash.mavenrepository.repository.exceptions.InvalidRepositoryNameException
+import ru.spliterash.mavenrepository.repository.exceptions.NotFoundException
 import ru.spliterash.mavenrepository.repository.result.*
 import java.io.File
 import java.io.FileFilter
@@ -37,13 +38,13 @@ class MavenRepositoryService(
         }
     }
 
-    fun readFile(path: String, auth: Boolean): QueryResult? {
+    fun readFile(path: String, auth: Boolean): QueryResult {
         if (path == "/" && !auth) {
             return FolderResult(listOf(FileInfo("group", 0, FileInfo.Type.DIRECTORY)))
         }
 
         if (path == "/maven-metadata.xml")
-            return null
+            throw NotFoundException()
 
         val repoName = repoName(path)
 
@@ -73,7 +74,7 @@ class MavenRepositoryService(
         else
             repositoryFolder.listFiles(FileFilter { it.isDirectory })?.map { it.name } ?: listOf()
         if (searchInRepos.isEmpty())
-            return null
+            throw NotFoundException()
 
         var fileRelativePath = path.substring(repoName.length + 1)
         if (fileRelativePath.isEmpty())

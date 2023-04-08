@@ -9,6 +9,7 @@ import org.springframework.web.servlet.NoHandlerFoundException
 import ru.spliterash.mavenrepository.auth.Auth
 import ru.spliterash.mavenrepository.auth.NotAuthException
 import ru.spliterash.mavenrepository.repository.MavenRepositoryService
+import ru.spliterash.mavenrepository.repository.exceptions.NotFoundException
 import ru.spliterash.mavenrepository.repository.result.FileResult
 import ru.spliterash.mavenrepository.repository.result.FolderResult
 import java.io.InputStream
@@ -34,10 +35,15 @@ class MavenController(
     }
 
     fun readFile(response: HttpServletResponse, path: String, auth: Boolean) {
-        val result = mavenService.readFile(path, auth) ?: run {
+        val result = try {
+            mavenService.readFile(path, auth)
+        } catch (ex: NotFoundException) {
             notFound(response)
             return
+        } catch (ex: NotAuthException) {
+            notAuth(response)
         }
+
         when (result) {
             is FolderResult -> {
                 notFound(response)
@@ -62,7 +68,8 @@ class MavenController(
     }
 
     fun notAuth(response: HttpServletResponse) {
-        notFound(response)
+        response.status = 401
+        response.setHeader("WWW-Authenticate", """Basic realm="SpliterashMavenRepo", charset="UTF-8"""")
     }
 
     private fun notFoundPage(): ByteArray {

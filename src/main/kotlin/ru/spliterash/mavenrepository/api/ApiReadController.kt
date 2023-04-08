@@ -12,6 +12,7 @@ import ru.spliterash.mavenrepository.api.response.InfoResponse
 import ru.spliterash.mavenrepository.auth.Auth
 import ru.spliterash.mavenrepository.auth.NotAuthException
 import ru.spliterash.mavenrepository.repository.MavenRepositoryService
+import ru.spliterash.mavenrepository.repository.exceptions.NotFoundException
 import ru.spliterash.mavenrepository.repository.result.FileInfo
 import ru.spliterash.mavenrepository.repository.result.FolderResult
 
@@ -24,7 +25,6 @@ class ApiReadController(
         @Auth authorized: Boolean,
         @PathVariable path: String
     ): ResponseEntity<*> = when (val queryResult = service.readFile(path, authorized)) {
-        null -> noAuth()
         is FolderResult -> ResponseEntity.ok(
             InfoResponse(
                 FilenameUtils.getName(path),
@@ -42,12 +42,19 @@ class ApiReadController(
         )
     }
 
-    fun noAuth(): ResponseEntity<*> {
-        return ResponseEntity.status(404).body(ErrorResponse(404, "Resource not found"))
-    }
+    fun notAuth(): ResponseEntity<*> = ResponseEntity
+        .status(401)
+        .body(ErrorResponse(401, "Not auth"))
+
+    fun notFound(): ResponseEntity<*> = ResponseEntity
+        .status(404)
+        .body(ErrorResponse(404, "Resource not found"))
 
     @ExceptionHandler(NotAuthException::class)
-    fun handleNoAuth(response: HttpServletResponse) = noAuth()
+    fun handleNoAuth(response: HttpServletResponse) = notAuth()
+
+    @ExceptionHandler(NotFoundException::class)
+    fun handleNotFound(response: HttpServletResponse) = notFound()
 
     private fun mapFile(file: FileInfo): InfoResponse.Item {
         val ext = file.name.substringAfterLast(".")
