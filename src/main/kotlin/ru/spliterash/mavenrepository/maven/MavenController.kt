@@ -27,10 +27,32 @@ class MavenController(
         try {
             if (request.method == "GET")
                 readFile(response, path, auth)
-            else
+            else if (request.method == "HEAD")
+                readFileHead(response, path, auth)
+            else if (request.method == "PUT" || request.method == "POST")
                 putFile(auth, request, request.inputStream)
+            else
+                notSupported(response)
         } catch (ex: NotAuthException) {
             notAuth(response)
+        }
+    }
+
+    private fun notSupported(response: HttpServletResponse) {
+        response.status = 405
+    }
+
+    private fun readFileHead(response: HttpServletResponse, path: String, auth: Boolean) {
+        val result = try {
+            mavenService.readFile(path, auth)
+        } catch (ex: NotFoundException) {
+            notFound(response)
+            return
+        } catch (ex: NotAuthException) {
+            notAuth(response)
+        }
+        if (result is FolderResult) {
+            response.status = 404
         }
     }
 
@@ -38,7 +60,7 @@ class MavenController(
         val result = try {
             mavenService.readFile(path, auth)
         } catch (ex: NotFoundException) {
-            notFound(response)
+            response.status = 404
             return
         } catch (ex: NotAuthException) {
             notAuth(response)
