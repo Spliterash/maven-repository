@@ -46,7 +46,7 @@ class MavenController(
         val result = try {
             mavenService.readFile(path, auth)
         } catch (ex: NotFoundException) {
-            notFound(response)
+            response.status = 404
             return
         } catch (ex: NotAuthException) {
             notAuth(response)
